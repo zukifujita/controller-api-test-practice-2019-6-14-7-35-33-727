@@ -5,12 +5,8 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import javax.xml.bind.annotation.XmlAnyElement;
 
 public class ResourceWithUrl<T> {
-
     private T content;
     private String url;
-
-    public ResourceWithUrl() {
-    }
 
     public ResourceWithUrl(T content, String url) {
         this.content = content;

@@ -29,21 +29,19 @@ public class TodoController {
     @GetMapping
     public HttpEntity<Collection<ResourceWithUrl>> getAll() {
         List<ResourceWithUrl> resourceWithUrls = todoRepository.getAll().stream()
-                .map(todo -> toResource(todo))
+                .map(this::toResource)
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(resourceWithUrls);
     }
 
     @GetMapping("/{todo-id}")
     public HttpEntity<ResourceWithUrl> getTodo(@PathVariable("todo-id") long id) {
-
         Optional<Todo> todoOptional = todoRepository.findById(id);
 
-        if (!todoOptional.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return respondWithResource(todoOptional.get(), OK);
+        return todoOptional
+                .map(todo -> respondWithResource(todo, OK))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping(headers = {"Content-type=application/json"})

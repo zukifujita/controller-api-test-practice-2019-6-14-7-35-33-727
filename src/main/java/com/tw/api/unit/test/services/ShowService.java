@@ -14,9 +14,7 @@ public class ShowService {
 		this.textService = textService;
 	}
 
-	public String getShowLable() {
-
+	public String getShowLabel() {
 		return textService.getText();
-
 	}
 }

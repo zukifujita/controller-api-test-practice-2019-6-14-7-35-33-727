@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,13 +18,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ShowController.class)
 @ActiveProfiles(profiles = "test")
 class ShowControllerTest {
-
-
     @Autowired
     private ShowController showController;
 
@@ -37,14 +33,13 @@ class ShowControllerTest {
 
     @Test
     void getAll() throws Exception {
-
         //given
-        when(showService.getShowLable()).thenReturn("a beauity tag");
+        when(showService.getShowLabel()).thenReturn("a beauty tag");
         //when
         ResultActions result = mvc.perform(get("/shows"));
         //then
         result.andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(jsonPath("$", is("a beauity tag")));
+                .andExpect(jsonPath("$", is("a beauty tag")));
     }
 }
