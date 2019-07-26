@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/shows")
 public class ShowController {
-
-
     private final ShowService showService;
 
     @Autowired
@@ -22,8 +20,6 @@ public class ShowController {
 
     @GetMapping(produces = {"application/json"})
     public ResponseEntity<String> getAll() {
-
-        return ResponseEntity.ok(this.showService.getShowLable());
+        return ResponseEntity.ok(this.showService.getShowLabel());
     }
-
 }

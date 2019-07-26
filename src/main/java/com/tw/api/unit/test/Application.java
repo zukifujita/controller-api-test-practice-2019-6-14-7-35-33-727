@@ -12,14 +12,11 @@ import org.springframework.context.annotation.Profile;
 
 @SpringBootApplication
 public class Application {
-
-
 	private static final Logger LOG = LoggerFactory.getLogger(Application.class);
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}
-
 
 	@Bean
 	@Profile("local")

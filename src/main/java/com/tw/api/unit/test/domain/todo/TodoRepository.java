@@ -1,13 +1,8 @@
 package com.tw.api.unit.test.domain.todo;
 
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Component
 public class TodoRepository {
@@ -19,7 +14,7 @@ public class TodoRepository {
     }
 
     public List<Todo> getAll() {
-        return todos.stream().collect(Collectors.toList());
+        return new ArrayList<>(todos);
     }
 
     public Optional<Todo> findById(long id) {
@@ -37,5 +32,4 @@ public class TodoRepository {
         }
         todos.add(todo);
     }
-
 }

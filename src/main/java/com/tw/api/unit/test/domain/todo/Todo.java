@@ -2,18 +2,10 @@ package com.tw.api.unit.test.domain.todo;
 
 
 public class Todo {
-
     private int id;
     private String title;
     private Boolean completed;
     private Integer order;
-
-    public Todo() {
-    }
-
-    public Todo(String title) {
-        this.title = title;
-    }
 
     public Todo(String title, Boolean completed) {
         this.title = title;
