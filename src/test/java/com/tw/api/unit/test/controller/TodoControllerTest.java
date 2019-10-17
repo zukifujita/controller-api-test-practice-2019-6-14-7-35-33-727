@@ -12,10 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.util.ResourceUtils;
 
-import javax.xml.transform.Result;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +20,12 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(TodoController.class)
+@ActiveProfiles(profiles = "test")
 class TodoControllerTest {
     @Autowired
     private TodoController todoController;
@@ -52,7 +50,6 @@ class TodoControllerTest {
         //then
         ResultActions result = mvc.perform(get("/todos"));
         result.andExpect(status().isOk())
-                .andDo(print())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].completed", is(true)))
                 .andExpect(jsonPath("$[0].title").value("title"));
@@ -69,10 +66,22 @@ class TodoControllerTest {
         //then
         ResultActions result = mvc.perform(get("/todos/{todo-id}", 1));
         result.andExpect(status().isOk())
-                .andDo(print())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.completed", is(true)))
                 .andExpect(jsonPath("$.title").value("title"));
+    }
+
+    @Test
+    void should_not_get_todo_by_id() throws Exception {
+        //given
+        List<Todo> todoList = new ArrayList<>();
+        Todo todo = new Todo(1, "title", true, 1);
+        todoList.add(todo);
+        //when
+        when(todoRepository.findById(1)).thenReturn(todoList.stream().findFirst());
+        //then
+        ResultActions result = mvc.perform(get("/todos/{todo-id}", 3));
+        result.andExpect(status().isNotFound());
     }
 
     @Test
@@ -84,8 +93,7 @@ class TodoControllerTest {
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(todo)));
         //then
-        result.andExpect(status().isCreated())
-                .andDo(print());
+        result.andExpect(status().isCreated());
     }
 
     @Test
@@ -101,8 +109,39 @@ class TodoControllerTest {
         ResultActions result = mvc.perform(patch("/todos/{todo-id}", 1)
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(todoUpdate)));
-        result.andExpect(status().isOk())
-                .andDo(print());
+        result.andExpect(status().isOk());
+    }
+
+    @Test
+    void should_not_update_todo_when_todo_is_present() throws Exception {
+        //given
+        List<Todo> todoList = new ArrayList<>();
+        Todo todo = new Todo(1, "title", true, 1);
+        Todo todoUpdate = new Todo(1, "title", true, 1);
+        todoList.add(todo);
+        //when
+        when(todoRepository.findById(1)).thenReturn(todoList.stream().findFirst());
+        //given
+        ResultActions result = mvc.perform(patch("/todos/{todo-id}", 3)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(todoUpdate)));
+        result.andExpect(status().isNotFound());
+    }
+
+    @Test
+    void should_not_update_todo_when_newTodo_is_null() throws Exception {
+        //given
+        List<Todo> todoList = new ArrayList<>();
+        Todo todo = new Todo(1, "title", true, 1);
+        Todo newTodo = new Todo(1, "title2", true, 1);
+        todoList.add(todo);
+        //when
+        when(todoRepository.findById(1)).thenReturn(todoList.stream().findFirst());
+        //given
+        ResultActions result = mvc.perform(patch("/todos/{todo-id}", 1)
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(null)));
+        result.andExpect(status().isBadRequest());
     }
 
     @Test
@@ -116,5 +155,18 @@ class TodoControllerTest {
         //then
         ResultActions result = mvc.perform(delete("/todos/{id}", 1));
         result.andExpect(status().isOk());
+    }
+
+    @Test
+    void should_not_delete_todo_by_id() throws Exception {
+        //given
+        List<Todo> todoList = new ArrayList<>();
+        Todo todo = new Todo(1, "title", true, 1);
+        todoList.add(todo);
+        //when
+        when(todoRepository.findById(1)).thenReturn(todoList.stream().findFirst());
+        //then
+        ResultActions result = mvc.perform(delete("/todos/{id}", 2));
+        result.andExpect(status().isNotFound());
     }
 }
